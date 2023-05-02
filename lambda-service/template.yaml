@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Upload images and let AI analyze them!
+
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  ImageRecognitionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: helloworld.App::handleRequest
+      Runtime: java8
+      MemorySize: 512
+      Events:
+        AnalyzeImage:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /image
+            Method: POST
+            RestApiId: !Ref ImageApiGateway
+        UploadImage:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /upload
+            Method: POST
+            RestApiId: !Ref ImageApiGateway
+
+  ImageApiGateway:
+    Type: "AWS::Serverless::Api"
+    Properties:
+      StageName: stage
+      Cors:
+        AllowMethods: "'POST, PUT'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
+
+# ImageFunctionIamRole:
+#    Type: "AWS::IAM::Role"
+#    Properties:
+#      AssumeRolePolicyDocument:
+#        Version: "2012-10-17"
+#        Statement:
+#          - Effect: "Allow"
+#            Action:
+#              - "rekognition:*"
+#            Resource: "*"
+#            Principal:
+#              Service:
+#                - "lambda.amazonaws.com" 
+
+                
+Outputs:
+  ImageApiGateway:
+    Description: "API Gateway endpoint URL for Prod stage for Image Recognition function"
+    Value: !Sub "https://${ImageApiGateway}.execute-api.${AWS::Region}.amazonaws.com/image"
+  ImageRecognitionFunction:
+    Description: "Image Lambda Function ARN"
+    Value: !GetAtt ImageRecognitionFunction.Arn
+#  ImageFunctionIamRole:
+#    Description: "Implicit IAM Role created for Image Recognition function"
+#    Value: !GetAtt ImageRecognitionFunctionRole.Arn
