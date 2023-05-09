@@ -59,10 +59,10 @@ function App() {
 
   console.log(labels);
 
-  return (<>
+  return (<div className="container">
     <div className="imageContainer">
-      <h3>Image Recongition</h3>
-      {!isLoaded && <p>Please upload an image!</p>}
+      <h3 className="labelTitle">Image Recongition</h3>
+      <p className="labelSubTitle">Please upload an image, then click analyze and AI will do the rest!!</p>
       <input id="imageInput" type="file" onChange={handleImage}></input>
       {isLoaded &&
         <div style={{marginTop: "20px"}}>
@@ -83,7 +83,7 @@ function App() {
         ))
       }
     </div>
-  </>);
+  </div>);
 }
 
 export default App;
